@@ -34,30 +34,33 @@
       (subvec acc 1 iter)
       (recur (conj acc (lcg (last acc) a c m))))))
 
-(defn lcg-svg
+(defn lcg-svg-2d
   [{:keys [width start a c m iter color bg]}]
   (->> (lcg-seq start a c m iter)
         (partition 2)
         (map
           (fn [point]
+            (let [red (m/random 0.3 0.6) 
+                  green (m/random 0.7 0.9) 
+                  blue (m/random 0.7 1)
+                  radius (m/random 1 3)]
             (->
               (->> (vec point)
                 (map #(* (/ % m) width))
                 (v/vec2))
-              (c/circle 1))))
+              (svg/circle radius {:fill (col/rgba red green blue 0.6)})))))
         (svg/group
-          {:fill (or color "rgba(0,0,0,0.25)") :stroke "none"}
+          {:fill "none" :stroke "none"}
           (if bg (svg/rect [0 0] width width {:fill bg}))
           )
         (svg-doc width)))
 
 
-(spit "lcg-viz.svg" (lcg-svg {
+(spit "lcg-viz-2d.svg" (lcg-svg-2d {
   :width 600
   :start 0 
   :a 29 
   :c 177 
   :m 82847 
-  :iter 10001
-  :color "rgba(255,220,200,0.5)"
+  :iter 20001
   :bg "rgba(0,0,20,1)"}))
